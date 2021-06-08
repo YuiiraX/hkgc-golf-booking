@@ -3,6 +3,7 @@ const open = require("open");
 
 const start = 8;
 const end = 12;
+
 const slots = timetable.EdenCourse.Slots;
 const baseUrl = "https://visitorbookings.hkgolfclub.org/Booking/AddBooking/";
 const suffix = "?fm=bv";
@@ -18,8 +19,9 @@ const morningSlots = slots.filter((item) => {
 // console.log(morningSlots.length);
 function openBooking(slots) {
   slots.forEach(async (slot) => {
-    console.log("Timeslot: ", slot.Timeslot, slot.WholeTimeslot);
-    await open(baseUrl + slot.WholeTimeslot + suffix);
+    var url = baseUrl + slot.WholeTimeslot + suffix
+    console.log("Timeslot: ", slot.Timeslot, "|", slot.WholeTimeslot);
+    await open(url);
   });
 }
 
@@ -33,8 +35,8 @@ function formatTime(time) {
 }
 
 var targetTime = new Date()
-targetTime.setHours(11)
-targetTime.setMinutes(59)
+targetTime.setHours(7)
+targetTime.setMinutes(55)
 targetTime.setSeconds(55)
 target = formatTime(targetTime)
 
