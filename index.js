@@ -23,14 +23,28 @@ function openBooking(slots) {
   });
 }
 
+function formatTime(time) {
+  return new Intl.DateTimeFormat('default', {
+    hour12: false,
+    hour: 'numeric',
+    minute: 'numeric',
+    second: 'numeric'
+  }).format(time)
+}
+
+var targetTime = new Date()
+targetTime.setHours(11)
+targetTime.setMinutes(59)
+targetTime.setSeconds(55)
+target = formatTime(targetTime)
+
 var interval = setInterval(() => {
-  var now = new Date()
-  var target = new Date()
-  target.setHours(12)
-  target.setMinutes(13)
-  target.setSeconds(0)
-  console.log(now, target)
-  if(now > target) {
+  var nowTime = new Date()
+  var now = formatTime(new Date())
+  console.clear()
+  console.log(`Target: ${target}`)
+  console.log(`Now: \t${now}`)
+  if (nowTime > targetTime) {
     openBooking(morningSlots)
     clearInterval(interval)
   }
