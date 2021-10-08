@@ -1,13 +1,13 @@
 const { timetable } = require("./timetable.json");
 const open = require("open");
 
-const start = 8;
+const start = 10;
 const end = 12;
-const slots = timetable.EdenCourse.Slots;
+const slots = timetable.NewCourse.Slots;
 const baseUrl = "https://visitorbookings.hkgolfclub.org/Booking/AddBooking/";
 const suffix = "?fm=bv";
 
-const morningSlots = slots.filter((item) => {
+const targetSlots = slots.filter((item) => {
   return (
     parseInt(item.Timeslot.split(":")[0]) >= start &&
     parseInt(item.Timeslot.split(":")[0]) < end &&
@@ -15,12 +15,13 @@ const morningSlots = slots.filter((item) => {
   );
 });
 
-// console.log(morningSlots.length);
-function openBooking(slots) {
-  slots.forEach(async (slot) => {
-    console.log("Timeslot: ", slot.Timeslot, slot.WholeTimeslot);
-    await open(baseUrl + slot.WholeTimeslot + suffix);
-  });
+async function openBooking(slots) {
+  for(var slot of slots)
+  {
+    const url = baseUrl + slot.WholeTimeslot + suffix;
+    console.log("Timeslot: ", slot.Timeslot, slot.WholeTimeslot, url);
+    await open(url);
+  }
 }
 
 function formatTime(time) {
@@ -35,7 +36,7 @@ function formatTime(time) {
 var targetTime = new Date()
 targetTime.setHours(11)
 targetTime.setMinutes(59)
-targetTime.setSeconds(55)
+targetTime.setSeconds(57)
 target = formatTime(targetTime)
 
 var interval = setInterval(() => {
@@ -45,7 +46,7 @@ var interval = setInterval(() => {
   console.log(`Target: ${target}`)
   console.log(`Now: \t${now}`)
   if (nowTime > targetTime) {
-    openBooking(morningSlots)
     clearInterval(interval)
+    openBooking(targetSlots)
   }
 }, 1000);
