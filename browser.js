@@ -1,11 +1,14 @@
 const cheater = angular.element($(".main-container")[0]);
 const scope = cheater.scope();
 const bookingFactory = cheater.injector().get("bookingFactory");
+const baseUrl = "https://visitorbookings.hkgolfclub.org/Booking/AddBooking/";
+const suffix = "?fm=bv";
 
-const end = 16;
+let end = 15;
 let tries = 0;
 let stopBooking = false;
 let tester;
+let validSlots = [];
 
 function GetMonth(val) {
   switch (val) {
@@ -41,42 +44,49 @@ var date = scope.CourseRotationModel.SelectedDate.split(",")[1].split(" ");
 var selectDate = date[3] + "-" + GetMonth(date[2]) + "-" + date[1];
 
 function findValidSlot(data) {
+  // console.table(data);
   let valid = [];
-  valid = valid.concat(
-    data.EdenCourse.Slots.filter((val) => {
-      return (
-        val.IsAllowBooking &&
-        val.IsVisitor &&
-        val.WholeTimeslot !== null &&
-        parseInt(val.Timeslot.split(":")[0]) < end
-      );
-    })
-  );
-  valid = valid.concat(
-    data.NewCourse.Slots.filter((val) => {
-      return (
-        val.IsAllowBooking &&
-        val.IsVisitor &&
-        val.WholeTimeslot !== null &&
-        parseInt(val.Timeslot.split(":")[0]) < end
-      );
-    })
-  );
-  valid = valid.concat(
-    data.OldCourse.Slots.filter((val) => {
-      return (
-        val.IsAllowBooking &&
-        val.IsVisitor &&
-        val.WholeTimeslot !== null &&
-        parseInt(val.Timeslot.split(":")[0]) < end
-      );
-    })
-  );
+  if (data.EdenCourse.Slots) {
+    valid = valid.concat(
+      data.EdenCourse.Slots.filter((val) => {
+        return (
+          val.IsAllowBooking &&
+          val.IsVisitor &&
+          val.WholeTimeslot !== null &&
+          parseInt(val.Timeslot.split(":")[0]) < end
+        );
+      })
+    );
+  }
+  if (data.NewCourse.Slots) {
+    valid = valid.concat(
+      data.NewCourse.Slots.filter((val) => {
+        return (
+          val.IsAllowBooking &&
+          val.IsVisitor &&
+          val.WholeTimeslot !== null &&
+          parseInt(val.Timeslot.split(":")[0]) < end
+        );
+      })
+    );
+  }
+  if (data.OldCourse.Slots) {
+    valid = valid.concat(
+      data.OldCourse.Slots.filter((val) => {
+        return (
+          val.IsAllowBooking &&
+          val.IsVisitor &&
+          val.WholeTimeslot !== null &&
+          parseInt(val.Timeslot.split(":")[0]) < end
+        );
+      })
+    );
+  }
   return valid;
 }
 
 function tryBook() {
-  console.debug("Trial #", tries)
+  console.debug("Trial #", tries);
 
   if (tries < 3600 && !stopBooking) {
     tries++;
@@ -86,32 +96,29 @@ function tryBook() {
   }
 
   bookingFactory.getData(selectDate, false, false).then((response) => {
-    if (response.success) {
+    // console.debug(response);
+    if (response.success === true) {
+      // console.debug(findValidSlot(response.timetable));
       validSlots = findValidSlot(response.timetable);
+      console.debug(validSlots);
+      // console.table(validSlots);
       if (validSlots.length > 0) {
         for (let i = 0; i < validSlots.length; i++) {
           let slot = validSlots[i];
-          var data = {
-            id: slot.WholeTimeslot,
-            action: "add",
-            from: "bv",
-          };
-          bookingFactory.verifyEnterTimeslot(data).then(function (response) {
-            console.debug(response)
-            if (response.success) {
-              window.open(response.navigateUrl, "_blank");
-            }
-          });
+          window.open(`${baseUrl}${slot.WholeTimeslot}${suffix}`, "_blank");
         }
+        stop();
       }
     }
   });
 }
 
 function start() {
-   tester = setInterval(tryBook, 500);
+  tester = setInterval(tryBook, 500);
 }
 
 function stop() {
-  stopBooking = true
+  stopBooking = true;
 }
+
+start();

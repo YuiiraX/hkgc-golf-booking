@@ -5,7 +5,7 @@ const start = 10;
 const end = 12;
 
 const slots = timetable.EdenCourse.Slots;
-const baseUrl = "https://{{ theUrl }}/Booking/AddBooking/";
+const baseUrl = "https://visitorbookings.hkgolfclub.org/Booking/AddBooking/";
 const suffix = "?fm=bv";
 
 const targetSlots = slots.filter((item) => {
