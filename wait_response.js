@@ -96,12 +96,8 @@ function tryBook() {
   }
 
   bookingFactory.getData(selectDate, false, false).then((response) => {
-    // console.debug(response);
     if (response.success === true) {
-      // console.debug(findValidSlot(response.timetable));
       validSlots = findValidSlot(response.timetable);
-      // console.debug(validSlots);
-      // console.table(validSlots);
       if (validSlots.length > 0) {
         for (let i = 0; i < validSlots.length; i++) {
           let slot = validSlots[i];
